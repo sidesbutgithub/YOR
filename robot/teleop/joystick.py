@@ -3,6 +3,7 @@
 To run joystick on Jetson Nano, install xpad drivers, add user to the input group,
 and set appropriate udev rules.
 """
+import sys
 
 import time
 import numpy as np
@@ -19,8 +20,8 @@ XBOX_CONTROLLER_MAP = {
     "r1": 5,
     "left_horizontal_axis": 0,
     "left_vertical_axis": 1,
-    "right_horizontal_axis": 3,
-    "right_vertical_axis": 4,
+    "right_horizontal_axis": 2,
+    "right_vertical_axis": 3,
 }
 
 PS4_CONTROLLER_MAP = {
@@ -42,7 +43,7 @@ def apply_deadzone(arr, dz=0.05):
 
 
 class JoystickNode:
-    def __init__(self):
+    def __init__(self, port=5557):
         pygame.init()
         if pygame.joystick.get_count() < 1:
             raise RuntimeError("No joystick detected")
@@ -60,7 +61,7 @@ class JoystickNode:
         self.control_loop_running = False
 
         # RPC to YOR (which wraps the new Base)
-        self.yor = RPCClient(host="localhost", port=5557)
+        self.yor = RPCClient(host="localhost", port=port)
         self.yor.init()  # starts Base control loop on the server
 
         # D-pad debug state
@@ -123,6 +124,7 @@ class JoystickNode:
                 right_bumper = self.joystick.get_button(controller_map["r1"])
                 
                 if left_bumper:
+                    self.yor.home_left_arm()
                     self.max_vel_setting = (self.max_vel_setting + 1) % len(self.max_vels)
                     print("Max velocity setting:", self.max_vel_setting)
                     time.sleep(0.1)
@@ -182,7 +184,12 @@ class JoystickNode:
 
 
 def main():
-    node = JoystickNode()
+    argv = sys.argv
+    if len(argv) > 1:
+        port_num = argv[1]
+        node = JoystickNode(port=port_num)
+    else:
+        node = JoystickNode()
     node.control_loop()
 
 
