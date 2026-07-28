@@ -51,7 +51,7 @@ class SingleArmIK:
         arm_cost = [1e-3] * 7
         # posture_cost = lift_cost + arm_cost + arm_cost
         self.posture_task = mink.PostureTask(
-            self.model, cost=np.array(free_body_cost + base_cost + lift_cost + arm_cost + arm_cost)
+            self.model, cost=np.array(free_body_cost + base_cost +lift_cost + arm_cost + arm_cost)
         )
         self.tasks = [self.end_effector_task, self.posture_task]
         if use_lift:
@@ -74,7 +74,7 @@ class SingleArmIK:
 
     def init(self, q):
         current_q = self.configuration.q.copy()
-        current_q[self.dof_ids] = q[self.dof_ids]
+        current_q[self.dof_ids] = q
         self.configuration.update(current_q)
         self.posture_task.set_target_from_configuration(self.configuration)
         self.initalized_ = True
@@ -101,7 +101,7 @@ class SingleArmIK:
 
     def update_configuration(self, q: np.ndarray):
         current_q = self.configuration.q.copy()
-        current_q[self.dof_ids] = q[self.dof_ids]
+        current_q[self.dof_ids] = q
         self.configuration.update(current_q)
 
     def forward_kinematics(self) -> mink.SE3:

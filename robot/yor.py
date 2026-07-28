@@ -16,7 +16,7 @@ if str(_ROOT) not in sys.path:
 # Import Base from either package layout (robot/base.py) or flat (base.py)
 from robot.base import Base
 
-from robot.arm.arm import ArmNode
+from robot.arm.arm_agx_control import ArmNode
 from robot.base import BaseController
 from commlink import RPCServer, Subscriber
 from nerolib import FirmwareVersion
@@ -80,13 +80,13 @@ class YOR():
             _HERE = Path(__file__).parent
             self.left_arm = ArmNode(
                 can_port="can_left",
-                mjcf_path=(_HERE / "yor-description/nero-welded-base-and-lift.mjcf").as_posix(),
+                mjcf_path=(_HERE / "yor-description/scene.mjcf").as_posix(),
                 dynamixel_gripper=False,
                 firmware_version=FirmwareVersion.DEFAULT,
             )
             self.right_arm = ArmNode(
                 can_port="can_right",
-                mjcf_path=(_HERE / "yor-description/nero-welded-base-and-lift.mjcf").as_posix(),
+                mjcf_path=(_HERE / "yor-description/scene.mjcf").as_posix(),
                 is_left_arm=False,
                 dynamixel_gripper=False,
                 firmware_version=FirmwareVersion.DEFAULT,

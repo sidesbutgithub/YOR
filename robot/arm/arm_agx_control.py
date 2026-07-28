@@ -108,7 +108,7 @@ class ArmNode:
             print(f"[ArmNode] Failed to initialize pyArxArm on {can_port}: {e}")
             self.nero = None
 
-        self.set_vel_and_acc_limits(vel_limits=self.joint_vel_max, acc_limits=self.joint_acc_max)
+        #self.set_vel_and_acc_limits(vel_limits=self.joint_vel_max, acc_limits=self.joint_acc_max)
 
         self.target: Optional[mink.SE3] = None
         self.gripper_target: Optional[float] = None
@@ -393,7 +393,9 @@ class ArmNode:
     # helper to set limits for pyAgxArm api
     def set_vel_and_acc_limits(self, vel_limits, acc_limits):
         for joint_index in range(1, self.nero.joint_nums + 1):
+            print("attempting vel limit set:", vel_limits[joint_index-1])
             self.nero.set_joint_angle_vel_limits(joint_index=joint_index, max_joint_spd=vel_limits[joint_index-1])
+            print("attempting acc limit set:", acc_limits[joint_index-1])
             self.nero.set_joint_acc_limits(joint_index=joint_index, max_joint_acc=acc_limits[joint_index-1])
 
 if __name__ == "__main__":
