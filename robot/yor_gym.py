@@ -158,7 +158,6 @@ class YORMujocoBase():
 
             for i, dm in enumerate(self.drive_motors):
                 self.data.ctrl[dm] = float(mps_to_rad_ps(wheel_speeds[i]))
-            #print(wheel_speeds, target_fracs)
 
     # -------------- helpers --------------
     def _update_state(self) -> None:
@@ -279,7 +278,7 @@ class YORMujocoController():
         self.left_q_desired: Optional[np.ndarray] = None
         self.left_q_desired_lock = threading.Lock()
         self.left_ik_solver = SingleArmIK(
-            (_HERE / "yor-description/nero-welded-base-and-lift.mjcf").as_posix(),
+            (_HERE / "yor-description/scene.mjcf").as_posix(),
             solver_dt=self.solver_dt,
             joint_names=[
                 "left_arm_joint1",
@@ -296,7 +295,7 @@ class YORMujocoController():
         self.right_q_desired: Optional[np.ndarray] = None
         self.right_q_desired_lock = threading.Lock()
         self.right_ik_solver = SingleArmIK(
-            (_HERE / "yor-description/nero-welded-base-and-lift.mjcf").as_posix(),
+            (_HERE / "yor-description/scene.mjcf").as_posix(),
             solver_dt=self.solver_dt,
             joint_names=[
                 "right_arm_joint1",
@@ -387,6 +386,8 @@ class YORMujocoController():
             self.left_q_desired = q[self.left_ik_solver.dof_ids]
         with self.right_q_desired_lock:
             self.right_q_desired = q[self.right_ik_solver.dof_ids]
+        self.home_left_arm()
+        self.home_right_arm()
 
     def home_left_arm(self):
         with self.left_q_desired_lock:
@@ -426,7 +427,13 @@ class YORMujocoController():
             # move lift to desired
             self.lift_target = max(min(self.lift_target+self.lift_delta, 1.0), 0.0)
             self.data.ctrl[self.lift_id] = self.lift_target * 0.416
-
+            #print("left ee pose:", self.get_left_ee_pose())
+            #print("desired q:", self.left_q_desired)
+            #print("reported left joint pos:", self.get_left_joint_positions())
+            #print("internal qpos:", self.data.qpos.copy())
+            #print("left ik solver qpos ids", self.left_ik_solver.dof_ids)
+            #print("internal ctrl", self.data.ctrl)
+            #print("left ik solver actuator ids", self.left_ik_solver.actuator_ids)
             # step mujoco
             mujoco.mj_step(self.model, self.data)
             if self.render:
@@ -434,7 +441,7 @@ class YORMujocoController():
             rate_limiter.sleep()
 
 
-
+# Not updated yet
 class YORGymEnv(gym.Env):
     env_limit = 10
     distance_threshold = 0.5

@@ -31,7 +31,8 @@ class SingleArmIK:
             ee_frame = "left_arm_ee"
 
         # velocity_limits = {k: np.pi / 2 if "joint" in k else 0.05 for k in joint_names}
-        self.dof_ids = np.array([self.model.joint(name).id for name in joint_names])
+        free_joint_offset = 6
+        self.dof_ids = np.array([self.model.joint(name).id+free_joint_offset for name in joint_names])
         self.actuator_ids = np.array([self.model.actuator(name + "_pos").id for name in joint_names if "joint" in name])
         if use_lift:
             self.lift_actuator_id = self.model.actuator("Lift").id
@@ -44,11 +45,13 @@ class SingleArmIK:
             orientation_cost=0.1,
             lm_damping=1.0,
         )
-        lift_cost = [1e-1]
+        free_body_cost = [1e-1] * 6
+        base_cost = [1e-1] * 8
+        lift_cost = [1e-1] * 2
         arm_cost = [1e-3] * 7
         # posture_cost = lift_cost + arm_cost + arm_cost
         self.posture_task = mink.PostureTask(
-            self.model, cost=np.array(lift_cost + arm_cost + arm_cost)
+            self.model, cost=np.array(free_body_cost + base_cost + lift_cost + arm_cost + arm_cost)
         )
         self.tasks = [self.end_effector_task, self.posture_task]
         if use_lift:
@@ -58,6 +61,13 @@ class SingleArmIK:
             )
             self.tasks.append(self.lift_equality_task)
         self.limits = [mink.ConfigurationLimit(self.model)]  # , mink.VelocityLimit(self.model, velocity_limits)]
+
+        self.home_position = (
+            [0.0, 1.32, -1.71, 1.31, 0.0, 0.0, 0.0] 
+            # [1.57, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # Modified J1 from 1.38 to -1.38 to match current state sign
+            if ee_frame == "left_arm_ee"
+            else [0.0, 1.32, 1.71, 1.31, 0.0, 0.0, 0.0]
+        )
 
         # initial setup
         self.initalized_ = False
@@ -70,7 +80,7 @@ class SingleArmIK:
         self.initalized_ = True
 
     def get_home_q(self) -> np.ndarray:
-        return self.model.key("home").qpos[self.dof_ids]
+        return self.home_position
 
     def solve_ik(self, T_wt: mink.SE3, max_iter: int = 10, pos_eps: float = 1e-3, rot_eps: float = 1e-3):
         if not self.initalized_:
