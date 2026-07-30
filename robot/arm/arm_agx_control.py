@@ -62,6 +62,8 @@ class ArmNode:
             self.joint_vel_max = [3.0] * 7
             self.joint_acc_max = [15.0] * 7
             
+            self.torque_ranges = [24.0, 24.0, 16.0, 16.0, 8.0, 8.0, 8.0]
+
             if default_kp is not None:
                 if isinstance(default_kp, (int, float)):
                     self.default_kp = [float(default_kp)] * 7
@@ -255,7 +257,10 @@ class ArmNode:
         self.set_joint_target(qd, gripper_target, preview_time)
         if gripper_target is not None and self.dynamixel_gripper:
             self.gripper.move_to_pos(int(gripper_target * (self.gripper_range) + self.close_gripper_value))
-            
+
+    def torque_control(self, joint_index, coefficient):
+        self.nero.move_mit(kp=0, kd=0, joint_index=joint_index, t_ff=coefficient*self.torque_ranges[joint_index-1])
+
     #def set_gain(self, kp, kd):
         """
         Set Kp and Kd gains for the controller.

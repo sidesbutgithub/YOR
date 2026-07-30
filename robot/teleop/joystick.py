@@ -73,7 +73,8 @@ class JoystickNode:
 
         # control mode
         self.mode_num = 0
-        self.control_modes = ["base", "left arm translation", "left arm rotation"]
+        self.control_modes = ["base", "left arm translation", "left arm rotation", "left joints torque"]
+        self.torque_motor_index = 0
 
     def display_joystick_inputs(self):
         """Display current joystick input values"""
@@ -159,19 +160,6 @@ class JoystickNode:
                     pad = self.joystick.get_hat(0)
                     pad_x = pad[0]
                     pad_y = pad[1]
-
-                if pad_y != self.last_pad_y:
-                    print(f"D-pad Y changed: {self.last_pad_y} -> {pad_y}")
-                    if pad_y > 0:
-                        print("RPC: lift_up()")
-                        self.yor.lift_up()
-                    elif pad_y < 0:
-                        print("RPC: lift_down()")
-                        self.yor.lift_down()
-                    else:
-                        print("RPC: lift_stop()")
-                        self.yor.lift_stop()
-                    self.last_pad_y = pad_y
                 
                 # monitor change so you need to press to change mode
                 curr_mode = self.control_modes[self.mode_num]
@@ -199,6 +187,21 @@ class JoystickNode:
                     else:
                         pass
                     self.last_pad_x = pad_x
+
+                if curr_mode != "left joints torque":
+                    if pad_y != self.last_pad_y:
+                        print(f"D-pad Y changed: {self.last_pad_y} -> {pad_y}")
+                        if pad_y > 0:
+                            print("RPC: lift_up()")
+                            self.yor.lift_up()
+                        elif pad_y < 0:
+                            print("RPC: lift_down()")
+                            self.yor.lift_down()
+                        else:
+                            print("RPC: lift_stop()")
+                            self.yor.lift_stop()
+                        self.last_pad_y = pad_y
+
 
                 if curr_mode == "base":
                     # Right stick → translation (vx, vy), Left stick X → yaw rate
@@ -229,7 +232,7 @@ class JoystickNode:
                         continue
                     translation_arr = 0.1 * translation_arr
                     left_desired = mink.SE3.from_translation(translation_arr) @ arm_current_pos
-                    print(left_desired)
+                    #print(left_desired)
                     self.yor.set_left_ee_target(left_desired)
 
                 elif curr_mode == "left arm rotation":
@@ -245,8 +248,24 @@ class JoystickNode:
                         continue
                     rot_array = 0.1 * rot_array * 2 * np.pi
                     left_desired = arm_current_pos @ mink.SE3.from_rotation(mink.SO3.from_rpy_radians(d_roll, d_pitch, d_yaw))
-                    print(left_desired)
+                    #print(left_desired)
                     self.yor.set_left_ee_target(left_desired)
+                
+                elif curr_mode == "left joints torque":
+                    torque_val = -self.joystick.get_axis(controller_map["right_vertical_axis"])
+                    torque_val = apply_deadzone(np.array([torque_val], dtype=float))
+                    if pad_y != self.last_pad_y:
+                        print(f"D-pad Y changed: {self.last_pad_y} -> {pad_y}")
+                        if pad_y > 0:
+                            print(f"Changing Torque Motor Control Index: {self.torque_motor_index+1} -> {(self.torque_motor_index+1)%7 + 1}")
+                            self.torque_motor_index = (self.torque_motor_index+1)%7
+                        elif pad_y < 0:
+                            print(f"Changing Torque Motor Control Index: {self.torque_motor_index+1} -> {(self.torque_motor_index-1)%7 + 1}")
+                            self.torque_motor_index = (self.torque_motor_index-1)%7
+                        else:
+                            pass
+                        self.last_pad_y = pad_y
+                    self.yor.torque_control(self.torque_motor_index+1, torque_val)
                 else:
                     raise Exception("Controller: Unrecognized Control Mode")
 
