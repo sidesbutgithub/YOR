@@ -265,7 +265,7 @@ class JoystickNode:
                         else:
                             pass
                         self.last_pad_y = pad_y
-                    self.yor.torque_control(self.torque_motor_index+1, torque_val)
+                    self.yor.set_left_torque_control(self.torque_motor_index+1, torque_val)
                 else:
                     raise Exception("Controller: Unrecognized Control Mode")
 

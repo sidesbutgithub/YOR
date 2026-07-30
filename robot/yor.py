@@ -259,6 +259,13 @@ class YOR():
         self.left_arm.set_gain(kp, kd)
 
     @require_initialization
+    def set_left_torque_control(self, joint_index, coefficient):
+        if self.no_arms:
+            print("left arm disabled")
+            return
+        self.left_arm.torque_control(joint_index=joint_index, coefficient=coefficient)
+
+    @require_initialization
     def home_left_arm(self, gripper_target: float = 0.0):
         if self.no_arms:
             print("left arm disabled")
