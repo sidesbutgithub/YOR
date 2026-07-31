@@ -22,8 +22,8 @@ XBOX_CONTROLLER_MAP = {
     "r1": 5,
     "left_horizontal_axis": 0,
     "left_vertical_axis": 1,
-    "right_horizontal_axis": 3,
-    "right_vertical_axis": 4,
+    "right_horizontal_axis": 2,
+    "right_vertical_axis": 3,
 }
 
 PS4_CONTROLLER_MAP = {

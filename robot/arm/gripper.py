@@ -62,4 +62,5 @@ class Gripper:
         self.dxl.disable()
 
 if __name__ == "__main__":
-    left_gripper = Gripper(baudrate=BAUDRATE, dxl_id=3)
+    left_gripper = Gripper(baudrate=57600, dxl_id=1, device_name='COM6')
+    print(left_gripper.dxl.calibrate_motor())

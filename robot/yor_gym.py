@@ -321,7 +321,7 @@ class YORMujocoController():
         self.control_loop_running = False
 
     def set_left_ee_target(self, ee_target: mink.SE3, gripper_target: float = 0.0, preview_time: float = 0.0):
-        self.left_ik_solver.update_configuration(self.data.qpos.copy())
+        self.left_ik_solver.update_configuration(self.data.qpos.copy()[self.left_ik_solver.dof_ids])
         qd, is_solved = self.left_ik_solver.solve_ik(ee_target)
         print(f"desired q: {np.round(qd, 4)} | is_solved: {is_solved}")
         with self.left_q_desired_lock:
@@ -336,11 +336,11 @@ class YORMujocoController():
 
     def get_left_ee_pose(self) -> mink.SE3:
         q = self.data.qpos.copy()
-        self.left_ik_solver.update_configuration(q)
+        self.left_ik_solver.update_configuration(q[self.left_ik_solver.dof_ids])
         return self.left_ik_solver.forward_kinematics()
 
     def set_right_ee_target(self, ee_target: mink.SE3, gripper_target: float = 0.0, preview_time: float = 0.0):
-        self.right_ik_solver.update_configuration(self.data.qpos.copy())
+        self.right_ik_solver.update_configuration(self.data.qpos.copy()[self.right_ik_solver.dof_ids])
         qd, is_solved = self.right_ik_solver.solve_ik(ee_target)
         print(f"desired q: {np.round(qd, 4)} | is_solved: {is_solved}")
         with self.right_q_desired_lock:
@@ -355,7 +355,7 @@ class YORMujocoController():
 
     def get_right_ee_pose(self) -> mink.SE3:
         q = self.data.qpos.copy()
-        self.right_ik_solver.update_configuration(q)
+        self.right_ik_solver.update_configuration(q[self.right_ik_solver.dof_ids])
         return self.right_ik_solver.forward_kinematics()
 
     def start_control(self):
@@ -380,8 +380,8 @@ class YORMujocoController():
         time.sleep(0.1)
         # home
         q = self.data.qpos.copy()
-        self.left_ik_solver.init(q)
-        self.right_ik_solver.init(q)
+        self.left_ik_solver.init(q[self.left_ik_solver.dof_ids])
+        self.right_ik_solver.init(q[self.right_ik_solver.dof_ids])
         with self.left_q_desired_lock:
             self.left_q_desired = q[self.left_ik_solver.dof_ids]
         with self.right_q_desired_lock:
