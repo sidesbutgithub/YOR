@@ -338,6 +338,10 @@ class YORMujocoController():
         q = self.data.qpos.copy()
         self.left_ik_solver.update_configuration(q[self.left_ik_solver.dof_ids])
         return self.left_ik_solver.forward_kinematics()
+    
+    def set_left_torque_control(self, joint_index, coefficient):
+        print("Torque Control for sim not enabled yet.")
+        pass
 
     def set_right_ee_target(self, ee_target: mink.SE3, gripper_target: float = 0.0, preview_time: float = 0.0):
         self.right_ik_solver.update_configuration(self.data.qpos.copy()[self.right_ik_solver.dof_ids])
