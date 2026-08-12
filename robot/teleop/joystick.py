@@ -14,7 +14,6 @@ from loop_rate_limiters import RateLimiter
 from commlink import RPCClient
 import mink
 
-
 XBOX_CONTROLLER_MAP = {
     "start": 7,
     "back": 6,
@@ -38,7 +37,7 @@ PS4_CONTROLLER_MAP = {
 }
 
 controller_map = XBOX_CONTROLLER_MAP
-
+TWO_PI = 2.0 * np.pi
 
 def apply_deadzone(arr, dz=0.05):
     return np.where(np.abs(arr) <= dz, 0.0, np.sign(arr) * (np.abs(arr) - dz) / (1 - dz))
@@ -73,7 +72,7 @@ class JoystickNode:
 
         # control mode
         self.mode_num = 0
-        self.control_modes = ["base", "left arm translation", "left arm rotation", "left joints torque"]
+        self.control_modes = ["base", "left arm translation", "left arm rotation", "left joints upper", "left joints lower"]
         self.torque_motor_index = 0
 
     def display_joystick_inputs(self):
@@ -172,7 +171,7 @@ class JoystickNode:
                             last_target_velocity = np.array([0, 0, last_target_velocity[2]], dtype=float)
                             self.yor.set_base_velocity(np.array([0, 0, 0], dtype=float))
                         else:
-                            self.yor.set_left_ee_target(self.yor.get_left_ee_pose())
+                            self.yor.set_left_joint_target(self.yor.get_left_joint_positions())
                         curr_mode = self.control_modes[self.mode_num]
                     elif pad_x < 0:
                         self.mode_num = (self.mode_num-1)%len(self.control_modes)
@@ -181,26 +180,25 @@ class JoystickNode:
                             last_target_velocity = np.array([0, 0, last_target_velocity[2]], dtype=float)
                             self.yor.set_base_velocity(np.array([0, 0, 0], dtype=float))
                         else:
-                            self.yor.set_left_ee_target(self.yor.get_left_ee_pose())
+                            self.yor.set_left_joint_target(self.yor.get_left_joint_positions())
                         curr_mode = self.control_modes[self.mode_num]
                         
                     else:
                         pass
                     self.last_pad_x = pad_x
 
-                if curr_mode != "left joints torque":
-                    if pad_y != self.last_pad_y:
-                        print(f"D-pad Y changed: {self.last_pad_y} -> {pad_y}")
-                        if pad_y > 0:
-                            print("RPC: lift_up()")
-                            self.yor.lift_up()
-                        elif pad_y < 0:
-                            print("RPC: lift_down()")
-                            self.yor.lift_down()
-                        else:
-                            print("RPC: lift_stop()")
-                            self.yor.lift_stop()
-                        self.last_pad_y = pad_y
+                if pad_y != self.last_pad_y:
+                    print(f"D-pad Y changed: {self.last_pad_y} -> {pad_y}")
+                    if pad_y > 0:
+                        print("RPC: lift_up()")
+                        self.yor.lift_up()
+                    elif pad_y < 0:
+                        print("RPC: lift_down()")
+                        self.yor.lift_down()
+                    else:
+                        print("RPC: lift_stop()")
+                        self.yor.lift_stop()
+                    self.last_pad_y = pad_y
 
 
                 if curr_mode == "base":
@@ -251,21 +249,25 @@ class JoystickNode:
                     #print(left_desired)
                     self.yor.set_left_ee_target(left_desired)
                 
-                elif curr_mode == "left joints torque":
-                    torque_val = -self.joystick.get_axis(controller_map["right_vertical_axis"])
-                    torque_val = apply_deadzone(np.array([torque_val], dtype=float))
-                    if pad_y != self.last_pad_y:
-                        print(f"D-pad Y changed: {self.last_pad_y} -> {pad_y}")
-                        if pad_y > 0:
-                            print(f"Changing Torque Motor Control Index: {self.torque_motor_index+1} -> {(self.torque_motor_index+1)%7 + 1}")
-                            self.torque_motor_index = (self.torque_motor_index+1)%7
-                        elif pad_y < 0:
-                            print(f"Changing Torque Motor Control Index: {self.torque_motor_index+1} -> {(self.torque_motor_index-1)%7 + 1}")
-                            self.torque_motor_index = (self.torque_motor_index-1)%7
-                        else:
-                            pass
-                        self.last_pad_y = pad_y
-                    self.yor.set_left_torque_control(self.torque_motor_index+1, torque_val)
+                elif curr_mode == "left joints upper":
+                    j1 = -self.joystick.get_axis(controller_map["left_vertical_axis"])
+                    j2 = -self.joystick.get_axis(controller_map["left_horizontal_axis"])
+                    j3  = -self.joystick.get_axis(controller_map["right_horizontal_axis"])
+                    j4 = -self.joystick.get_axis(controller_map["right_vertical_axis"])
+                    joint_val = apply_deadzone(np.array([j1, j2, j3, j4], dtype=float))
+                    joint_pos = self.yor.get_left_joint_positions()
+                    joint_pos[0:4] += joint_val*0.01*TWO_PI
+
+                    self.yor.set_left_joint_target(joint_pos)
+                elif curr_mode == "left joints lower":
+                    j5 = -self.joystick.get_axis(controller_map["left_horizontal_axis"])
+                    j6 = -self.joystick.get_axis(controller_map["right_horizontal_axis"])
+                    j7  = -self.joystick.get_axis(controller_map["right_vertical_axis"])
+                    grip = -self.joystick.get_axis(controller_map["left_vertical_axis"])
+                    joint_val = apply_deadzone(np.array([j5, j6, j7, grip], dtype=float))
+                    joint_pos = self.yor.get_left_joint_positions()
+                    joint_pos[4:] = joint_val[:-1]*0.01*TWO_PI
+                    self.yor.set_left_joint_target(joint_pos, joint_val[-1])
                 else:
                     raise Exception("Controller: Unrecognized Control Mode")
 
