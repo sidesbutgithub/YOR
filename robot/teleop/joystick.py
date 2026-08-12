@@ -21,8 +21,8 @@ XBOX_CONTROLLER_MAP = {
     "r1": 5,
     "left_horizontal_axis": 0,
     "left_vertical_axis": 1,
-    "right_horizontal_axis": 2,
-    "right_vertical_axis": 3,
+    "right_horizontal_axis": 3,
+    "right_vertical_axis": 4,
 }
 
 PS4_CONTROLLER_MAP = {
@@ -170,6 +170,8 @@ class JoystickNode:
                         if curr_mode == "base":
                             last_target_velocity = np.array([0, 0, last_target_velocity[2]], dtype=float)
                             self.yor.set_base_velocity(np.array([0, 0, 0], dtype=float))
+                        elif curr_mode == "left joints torque":
+                            self.yor.initialize_torque_mode()
                         else:
                             self.yor.set_left_joint_target(self.yor.get_left_joint_positions())
                         curr_mode = self.control_modes[self.mode_num]
@@ -250,23 +252,23 @@ class JoystickNode:
                     self.yor.set_left_ee_target(left_desired)
                 
                 elif curr_mode == "left joints upper":
-                    j1 = -self.joystick.get_axis(controller_map["left_vertical_axis"])
-                    j2 = -self.joystick.get_axis(controller_map["left_horizontal_axis"])
-                    j3  = -self.joystick.get_axis(controller_map["right_horizontal_axis"])
+                    j1 = self.joystick.get_axis(controller_map["left_vertical_axis"])
+                    j2 = self.joystick.get_axis(controller_map["left_horizontal_axis"])
+                    j3  = self.joystick.get_axis(controller_map["right_horizontal_axis"])
                     j4 = -self.joystick.get_axis(controller_map["right_vertical_axis"])
                     joint_val = apply_deadzone(np.array([j1, j2, j3, j4], dtype=float))
-                    joint_pos = self.yor.get_left_joint_positions()
+                    joint_pos = np.copy(self.yor.get_left_joint_positions())
                     joint_pos[0:4] += joint_val*0.01*TWO_PI
 
                     self.yor.set_left_joint_target(joint_pos)
                 elif curr_mode == "left joints lower":
-                    j5 = -self.joystick.get_axis(controller_map["left_horizontal_axis"])
+                    j5 = self.joystick.get_axis(controller_map["left_horizontal_axis"])
                     j6 = -self.joystick.get_axis(controller_map["right_horizontal_axis"])
                     j7  = -self.joystick.get_axis(controller_map["right_vertical_axis"])
                     grip = -self.joystick.get_axis(controller_map["left_vertical_axis"])
                     joint_val = apply_deadzone(np.array([j5, j6, j7, grip], dtype=float))
-                    joint_pos = self.yor.get_left_joint_positions()
-                    joint_pos[4:] = joint_val[:-1]*0.01*TWO_PI
+                    joint_pos = np.copy(self.yor.get_left_joint_positions())
+                    joint_pos[4:] += joint_val[:-1]*0.01*TWO_PI
                     self.yor.set_left_joint_target(joint_pos, joint_val[-1])
                 else:
                     raise Exception("Controller: Unrecognized Control Mode")

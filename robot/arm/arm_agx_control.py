@@ -105,7 +105,7 @@ class ArmNode:
             else:
                 print(f"[ArmNode] {can_port} initialized and started.")
                 self.control_mode_set = True
-            
+            print(self.nero.get_firmware())
         except Exception as e:
             print(f"[ArmNode] Failed to initialize pyArxArm on {can_port}: {e}")
             self.nero = None
@@ -259,7 +259,11 @@ class ArmNode:
             self.gripper.move_to_pos(int(gripper_target * (self.gripper_range) + self.close_gripper_value))
 
     def torque_control(self, joint_index, coefficient):
-        self.nero.move_mit(kp=0, kd=0, joint_index=joint_index, t_ff=coefficient*self.torque_ranges[joint_index-1])
+        print("index:", joint_index, "t_ff:", coefficient*16.0)
+        self.nero.move_mit(kp=0, kd=0, joint_index=joint_index, t_ff=coefficient*16.0)
+
+    def initialize_torque_mode(self):
+        self.nero.set_motion_mode("mit")
 
     #def set_gain(self, kp, kd):
         """
