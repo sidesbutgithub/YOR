@@ -72,8 +72,9 @@ class JoystickNode:
 
         # control mode
         self.mode_num = 0
-        self.control_modes = ["base", "left arm translation", "left arm rotation", "left joints upper", "left joints lower"]
-        self.torque_motor_index = 0
+        self.control_modes = ("base", "left joints upper", "left joints lower", "right joints upper", "right joints lower")
+        self.left_gripper = 1.0
+        self.right_gripper = 1.0
 
     def display_joystick_inputs(self):
         """Display current joystick input values"""
@@ -269,7 +270,32 @@ class JoystickNode:
                     joint_val = apply_deadzone(np.array([j5, j6, j7, grip], dtype=float))
                     joint_pos = np.copy(self.yor.get_left_joint_positions())
                     joint_pos[4:] += joint_val[:-1]*0.01*TWO_PI
+                    self.left_gripper_gripper += joint_val[-1]
+                    self.left_gripper = max(0, min(self.left_gripper, 1.0))
                     self.yor.set_left_joint_target(joint_pos, joint_val[-1])
+
+                elif curr_mode == "right joints upper":
+                    j1 = self.joystick.get_axis(controller_map["left_vertical_axis"])
+                    j2 = self.joystick.get_axis(controller_map["left_horizontal_axis"])
+                    j3  = self.joystick.get_axis(controller_map["right_horizontal_axis"])
+                    j4 = -self.joystick.get_axis(controller_map["right_vertical_axis"])
+                    joint_val = apply_deadzone(np.array([j1, j2, j3, j4], dtype=float))
+                    joint_pos = np.copy(self.yor.get_right_joint_positions())
+                    joint_pos[0:4] += joint_val*0.01*TWO_PI
+
+                    self.yor.set_right_joint_target(joint_pos)
+                elif curr_mode == "right joints lower":
+                    j5 = self.joystick.get_axis(controller_map["left_horizontal_axis"])
+                    j6 = -self.joystick.get_axis(controller_map["right_horizontal_axis"])
+                    j7  = -self.joystick.get_axis(controller_map["right_vertical_axis"])
+                    grip = -self.joystick.get_axis(controller_map["left_vertical_axis"])
+                    joint_val = apply_deadzone(np.array([j5, j6, j7, grip], dtype=float))
+                    joint_pos = np.copy(self.yor.get_right_joint_positions())
+                    joint_pos[4:] += joint_val[:-1]*0.01*TWO_PI
+                    self.right_gripper += joint_val[-1]
+                    self.right_gripper = max(0, min(self.right_gripper, 1.0))
+                    
+                    self.yor.set_right_joint_target(joint_pos, self.right_gripper)
                 else:
                     raise Exception("Controller: Unrecognized Control Mode")
 

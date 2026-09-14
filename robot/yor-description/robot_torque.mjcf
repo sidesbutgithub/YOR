@@ -1,0 +1,404 @@
+<mujoco model="cone-e-nero">
+  <compiler angle="radian" meshdir="assets_nero"/>
+  <option integrator="implicitfast" cone="elliptic" impratio="10" gravity="0 0 -9.81" timestep="0.005" />
+  <default>
+    <default class="robot">
+      <default class="motor">
+        <joint />
+        <motor />
+      </default>
+      <default class="steering_joint">
+        <position kp="10" kv="1" inheritrange="1" />
+        <joint frictionloss="0.001" range="-3.14159 3.14159" />
+      </default>
+      <default class="drive_joint">
+        <velocity kv="1" />
+        <joint frictionloss="0.001" />
+      </default>
+      <default class="visual">
+        <geom material="visualgeom" type="mesh" contype="0" conaffinity="0" group="2" density="0"/>
+      </default>
+      <default class="collision">
+        <geom type="capsule" condim="3" contype="0" conaffinity="1" priority="1" group="1" solref="0.005 1"
+          friction="1 0.01 0.01" />
+        <equality solimp="0.99 0.999 1e-05" solref="0.005 1" />
+      </default>
+      <default class="wheel">
+        <!-- 4 is friction that opposes rotation around the contact normal -->
+        <geom type="mesh" condim="4" contype="0" conaffinity="1" priority="1" group="1" solref="0.005 1"
+          friction="1.2 0.005 0.005" />
+      </default>
+      <default class="telescope">
+        <joint type="slide" axis="0 0 1" damping="50" stiffness="0.02" armature="0.01" range="0 0.208" frictionloss="1.5"/>
+        <general ctrlrange="0 0.416" gainprm="150" biasprm="0 -100 -10" forcerange="-56 56"/>
+      </default>
+    </default>
+
+
+    <default class="nero">
+      <joint frictionloss="0.3" armature="0.005" />
+      <position inheritrange="1" forcerange="-100 100" />
+      <default class="collision_gripper">
+        <geom type="mesh" group="3" friction="2 0.005 0.0001" density="100" />
+      </default>
+    </default>
+  </default>
+
+
+  <asset>
+    <material name="gray_mat" rgba="0.59 0.59 0.59 1" />
+    <material name="light_medium_gray_mat" rgba="0.85 0.85 0.85 1" />
+
+
+    <!-- base and lift assets -->
+    <material name="base_material" rgba="1 0 0 1" />
+    <material name="base_profile_short_material" rgba="0.701961 0.701961 0.701961 1" />
+    <material name="Part_2_material" rgba="0.615686 0.811765 0.929412 1" />
+    <material name="MK4_Colson_Hub_4_X_1.5_material" rgba="0.666667 0.698039 0.768627 1" />
+    <material name="Lift_Middle_material" rgba="0.901961 0.901961 0.901961 1" />
+    <material name="default_material" rgba="0.7 0.7 0.7 1" />
+
+    <mesh name="base_profile_short.stl" file="meshes/base_profile_short.stl" />
+    <mesh name="Part_2.stl" file="meshes/Part_2.stl" />
+    <mesh name="MK4_Colson_Hub_4_X_1.5.stl" file="meshes/MK4_Colson_Hub_4_X_1.5.stl" />
+    <mesh name="Part_2_2.stl" file="meshes/Part_2_2.stl" />
+    <mesh name="MK4_Colson_Hub_4_X_1.5_2.stl" file="meshes/MK4_Colson_Hub_4_X_1.5_2.stl" />
+    <mesh name="Part_2_3.stl" file="meshes/Part_2_3.stl" />
+    <mesh name="MK4_Colson_Hub_4_X_1.5_3.stl" file="meshes/MK4_Colson_Hub_4_X_1.5_3.stl" />
+    <mesh name="Part_2_4.stl" file="meshes/Part_2_4.stl" />
+    <mesh name="MK4_Colson_Hub_4_X_1.5_4.stl" file="meshes/MK4_Colson_Hub_4_X_1.5_4.stl" />
+    <mesh name="Lift_Middle.stl" file="meshes/Lift_Middle.stl" />
+    <mesh name="Lift_Top.stl" file="meshes/Lift_Top.stl" />
+
+    <!-- Nero arm meshes -->
+    <mesh name="base_link" file="base_link.STL" />
+    <mesh name="link1" file="Link1.STL" />
+    <mesh name="link2" file="Link2.STL" />
+    <mesh name="link3" file="Link3.STL" />
+    <mesh name="link4" file="Link4.STL" />
+    <mesh name="link5" file="Link5.STL" />
+    <mesh name="link6" file="Link6.STL" />
+    <mesh name="link7" file="Link7.STL" />
+    <mesh name="stand_v2" file="stand_v2.STL" />
+
+  </asset>
+
+  <worldbody>
+    <body name="base" pos="0.00000000 0.00000000 0.10477502" euler="0 1.57 0" childclass="robot">
+      <freejoint name="floating_base" />
+      <geom name="base_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="base_material"
+        type="sphere" size="0.01" class="visual" />
+      <body name="base_profile_short" pos="0 0 0" quat="1.0 0.0 0.0 0.0">
+        <inertial pos="-0.104952 -0.210077 0.000819" quat="1.0 0.0 0.0 0.0" mass="20.612589"
+          diaginertia="0.321576 0.487585 0.4515" />
+        <geom name="base_profile_short_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="box"
+          mesh="base_profile_short.stl" class="collision" />
+        <geom name="base_profile_short_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+          material="base_profile_short_material" type="mesh" mesh="base_profile_short.stl"
+          class="visual" />
+        <body name="Part_2" pos="-0.028575 -0.053975 0.104775"
+          quat="0.5000001633974483 -0.4999999999999733 -0.49999983660255165 0.4999999999999733">
+          <joint name="front_left_steer" type="hinge" ref="0.0" class="steering_joint" axis="0 0 1" />
+          <inertial pos="0.000006 0 -0.020456" quat="1.0 0.0 0.0 0.0" mass="0.671221"
+            diaginertia="0.000668 0.000705 0.000812" />
+          <geom name="Part_2_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh"
+            mesh="Part_2.stl" class="collision" />
+          <geom name="Part_2_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="Part_2_material"
+            type="mesh" mesh="Part_2.stl" class="visual" />
+          <body name="MK4_Colson_Hub_4_X_1.5" pos="0.021272 0 -0.075425"
+            quat="0.5000001633974483 -0.4999999999999733 -0.49999983660255165 0.4999999999999733">
+            <joint name="drive_front_left" type="hinge" ref="0.0" class="drive_joint" axis="0 0 -1" />
+            <inertial pos="0 0 0.019800" quat="1.0 0.0 0.0 0.0" mass="0.507297"
+              diaginertia="0.000352 0.000352 0.000615" />
+            <geom name="MK4_Colson_Hub_4_X_1.5_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              type="mesh" mesh="MK4_Colson_Hub_4_X_1.5.stl" class="wheel" />
+            <geom name="MK4_Colson_Hub_4_X_1.5_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              material="MK4_Colson_Hub_4_X_1.5_material" type="mesh"
+              mesh="MK4_Colson_Hub_4_X_1.5.stl" class="visual" />
+          </body>
+        </body>
+        <body name="Part_2_2" pos="-0.028575 -0.053975 -0.104775"
+          quat="0.5000001633974483 -0.4999999999999733 -0.49999983660255165 0.4999999999999733">
+          <joint name="back_left_steer" type="hinge" ref="0.0" class="steering_joint" axis="0 0 1" />
+          <inertial pos="0.000006 0 -0.020456" quat="1.0 0.0 0.0 0.0" mass="0.671221"
+            diaginertia="0.000668 0.000705 0.000812" />
+          <geom name="Part_2_2_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh"
+            mesh="Part_2_2.stl" class="collision" />
+          <geom name="Part_2_2_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="Part_2_material"
+            type="mesh" mesh="Part_2_2.stl" class="visual" />
+          <body name="MK4_Colson_Hub_4_X_1.5_2" pos="0.021272 0 -0.075425"
+            quat="0.5000001633974483 -0.4999999999999733 -0.49999983660255165 0.4999999999999733">
+            <joint name="drive_back_left" type="hinge" ref="0.0" class="drive_joint" axis="0 0 -1" />
+            <inertial pos="0 0 0.019800" quat="1.0 0.0 0.0 0.0" mass="0.507297"
+              diaginertia="0.000352 0.000352 0.000615" />
+            <geom name="MK4_Colson_Hub_4_X_1.5_2_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              type="mesh" mesh="MK4_Colson_Hub_4_X_1.5_2.stl" class="wheel" />
+            <geom name="MK4_Colson_Hub_4_X_1.5_2_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              material="MK4_Colson_Hub_4_X_1.5_material" type="mesh"
+              mesh="MK4_Colson_Hub_4_X_1.5_2.stl" class="visual" />
+          </body>
+        </body>
+        <body name="Part_2_3" pos="-0.028575 -0.365125 0.104775"
+          quat="0.5000001633974483 -0.4999999999999733 -0.49999983660255165 0.4999999999999733">
+          <joint name="front_right_steer" type="hinge" ref="0.0" class="steering_joint" axis="0 0 1" />
+          <inertial pos="0.000006 0 -0.020456" quat="1.0 0.0 0.0 0.0" mass="0.671221"
+            diaginertia="0.000668 0.000705 0.000812" />
+          <geom name="Part_2_3_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh"
+            mesh="Part_2_3.stl" class="collision" />
+          <geom name="Part_2_3_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="Part_2_material"
+            type="mesh" mesh="Part_2_3.stl" class="visual" />
+          <body name="MK4_Colson_Hub_4_X_1.5_3" pos="0.021272 0 -0.075425"
+            quat="0.5000001633974483 -0.4999999999999733 -0.49999983660255165 0.4999999999999733">
+            <joint name="drive_front_right" type="hinge" ref="0.0" class="drive_joint" axis="0 0 -1" />
+            <inertial pos="0 0 0.019800" quat="1.0 0.0 0.0 0.0" mass="0.507297"
+              diaginertia="0.000352 0.000352 0.000615" />
+            <geom name="MK4_Colson_Hub_4_X_1.5_3_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              type="mesh" mesh="MK4_Colson_Hub_4_X_1.5_3.stl" class="wheel" />
+            <geom name="MK4_Colson_Hub_4_X_1.5_3_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              material="MK4_Colson_Hub_4_X_1.5_material" type="mesh"
+              mesh="MK4_Colson_Hub_4_X_1.5_3.stl" class="visual" />
+          </body>
+        </body>
+        <body name="Part_2_4" pos="-0.028575 -0.365125 -0.104775"
+          quat="0.5000001633974483 -0.4999999999999733 -0.49999983660255165 0.4999999999999733">
+          <joint name="back_right_steer" type="hinge" ref="0.0" class="steering_joint" axis="0 0 1" />
+          <inertial pos="0.000006 0 -0.020456" quat="1.0 0.0 0.0 0.0" mass="0.671221"
+            diaginertia="0.000668 0.000705 0.000812" />
+          <geom name="Part_2_4_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh"
+            mesh="Part_2_4.stl" class="collision" />
+          <geom name="Part_2_4_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="Part_2_material"
+            type="mesh" mesh="Part_2_4.stl" class="visual" />
+          <body name="MK4_Colson_Hub_4_X_1.5_4" pos="0.021272 0 -0.075425"
+            quat="0.5000001633974483 -0.4999999999999733 -0.49999983660255165 0.4999999999999733">
+            <joint name="drive_back_right" type="hinge" ref="0.0" class="drive_joint" axis="0 0 -1" />
+            <inertial pos="0 0 0.019800" quat="1.0 0.0 0.0 0.0" mass="0.507297"
+              diaginertia="0.000352 0.000352 0.000615" />
+            <geom name="MK4_Colson_Hub_4_X_1.5_4_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              type="mesh" mesh="MK4_Colson_Hub_4_X_1.5_4.stl" class="wheel" />
+            <geom name="MK4_Colson_Hub_4_X_1.5_4_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              material="MK4_Colson_Hub_4_X_1.5_material" type="mesh"
+              mesh="MK4_Colson_Hub_4_X_1.5_4.stl" class="visual" />
+          </body>
+        </body>
+        <body name="Lift_Middle" pos="-0.509400 -0.209550 0.000317"
+          quat="-1.2247452309842457e-07 -0.7071068967259713 -1.22474483074382e-07 0.7071066656470838">
+          <joint name="Slider_1" class="telescope"/>
+          <inertial pos="0 0 -0.104000" quat="1.0 0.0 0.0 0.0" mass="1.460741"
+            diaginertia="0.007792 0.007792 0.005051" />
+          <geom name="Lift_Middle_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh"
+            mesh="Lift_Middle.stl" class="collision" />
+          <geom name="Lift_Middle_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+            material="Lift_Middle_material" type="mesh" mesh="Lift_Middle.stl" class="visual" />
+          <body name="Lift_Top" pos="0 0 0" quat="1.0 0.0 0.0 0.0" gravcomp="1">
+            <joint name="Slider_2" class="telescope"/>
+            <inertial pos="0.000005 -0.000004 -0.024234" quat="1.0 0.0 0.0 0.0" mass="4.435110"
+              diaginertia="0.042873 0.040894 0.045651" />
+            <geom name="Lift_Top_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh"
+              mesh="Lift_Top.stl" class="collision" />
+            <geom name="Lift_Top_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0"
+              material="Lift_Middle_material" type="mesh" mesh="Lift_Top.stl" class="visual" />
+
+              <!-- Left Arm (7 DOF) - Nero structure with quaternions -->
+                <body name="left_arm_base_link" pos="-0.005 -0.125 0.0575" euler="1.5708 0 1.5708" childclass="nero" gravcomp="1">
+                  <inertial pos="-0.00963615 0.00016787 0.0448601" mass="0.77" diaginertia="0.0006669 0.00054501 0.00051509" />
+                  <geom mesh="base_link" class="visual" material="light_medium_gray_mat"/>
+                  <geom mesh="base_link" class="collision"/>
+                  
+                  <body name="left_arm_link1" pos="0 0 0.138" quat="1.0 0.0 0.0 0.0" gravcomp="0">
+                    <inertial pos="-0.00077 -0.00006 -0.00686" mass="0.77" diaginertia="0.0006669 0.00054501 0.00051509" />
+                    <joint name="left_arm_joint1" axis="0 0 1" range="-2.7 2.7"/>
+                    <geom mesh="link1" class="visual" material="gray_mat"/>
+                    <geom mesh="link1" class="collision"/>
+                    
+                    <body name="left_arm_link2" pos="0 0 0" quat="0.000033 0.000033 0.707105 -0.707108" gravcomp="0">
+                      <inertial pos="-0.00011 -0.06072 0.00148" mass="0.49" diaginertia="0.00053808 0.00029435 0.00040266" />
+                      <joint name="left_arm_joint2" axis="0 0 1" range="-1.74 1.74"/>
+                      <geom mesh="link2" class="visual" material="light_medium_gray_mat"/>
+                      <geom mesh="link2" class="collision"/>
+                      
+                      <body name="left_arm_link3" pos="0 -0.31 0" quat="-0.000003 0.000003 -0.707108 0.707105" gravcomp="0">
+                        <inertial pos="0.00014 0.00211 -0.04853" mass="0.67" diaginertia="0.00342528 0.0033924 0.00026169" />
+                        <joint name="left_arm_joint3" axis="0 0 1" range="-2.75 2.75"/>
+                        <geom mesh="link3" class="visual" material="gray_mat"/>
+                        <geom mesh="link3" class="collision"/>
+                        
+                        <body name="left_arm_link4" pos="0 0 0" quat="-0.000003 0.000003 -0.707108 0.707105" gravcomp="0">
+                          <inertial pos="-0.00013 -0.05482 0.00132" mass="0.41" diaginertia="0.00031331 0.00013204 0.0002393" />
+                          <joint name="left_arm_joint4" axis="0 0 1" range="0 2.14"/>
+                          <geom mesh="link4" class="visual" material="light_medium_gray_mat"/>
+                          <geom mesh="link4" class="collision"/>
+                          
+                          <body name="left_arm_link5" pos="0 -0.27001 0" quat="0.499998 0.500000 -0.500000 0.500002" gravcomp="0">
+                            <inertial pos="0.00303 0.00617 -0.11778" mass="0.56" diaginertia="0.0008249 0.00078548 0.00021015" />
+                            <joint name="left_arm_joint5" axis="0 0 1" range="-2.75 2.75"/>
+                            <geom mesh="link5" class="visual" material="gray_mat"/>
+                            <geom mesh="link5" class="collision"/>
+                            
+                            <body name="left_arm_link6" pos="0 0 0" quat="0.499998 0.500000 -0.500000 0.500002" gravcomp="0">
+                              <inertial pos="0.00014 -0.0027 -0.00025" mass="0.31" diaginertia="0.00008181 0.00007176 0.00007906" />
+                              <joint name="left_arm_joint6" axis="0 0 1" range="-0.73 0.95"/>
+                              <geom mesh="link6" class="visual" material="light_medium_gray_mat"/>
+                              <geom mesh="link6" class="collision"/>
+                              
+                              <body name="left_arm_link7" pos="0 -0.0235 0" euler="1.5708 0 -1.5708" gravcomp="0">
+                                <inertial pos="-0.00014 -0.0001 -0.00275" mass="0.000001" diaginertia="1.1e-07 1.1e-07 2e-07" />
+                                <joint name="left_arm_joint7" axis="0 0 1" range="-1.57 1.57"/>
+                                <geom mesh="link7" class="visual" material="gray_mat"/>
+                                <geom mesh="link7" class="collision"/>
+                                
+                                <!-- End Effector with stand_v2 -->
+                                <body name="left_arm_end_effector" pos="0 0.033 -0.0235" gravcomp="1">
+                                  <inertial pos="-0.01208 -0.00025 0.00032" mass="0.05" diaginertia="2.697e-05 4.311e-05 2.479e-05" />
+                                  <geom mesh="stand_v2" euler="-1.57 0 -1.57" class="visual" material="gray_mat"/>
+                                  <geom mesh="stand_v2" euler="-1.57 0 -1.57" class="collision"/>
+                                  <site name="left_arm_ee" pos="0 0 0.1"/>
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+
+            <!-- Right Arm (7 DOF) - Nero structure with quaternions -->
+                <body name="right_arm_base_link" pos="-0.005 0.125 0.0575" euler="-1.5708 0 4.7124" childclass="nero" gravcomp="1">
+                  <inertial pos="-0.00963615 0.00016787 0.0448601" mass="0.77" diaginertia="0.0006669 0.00054501 0.00051509" />
+                  <geom mesh="base_link" class="visual" material="light_medium_gray_mat"/>
+                  <geom mesh="base_link" class="collision"/>
+                  
+                  <body name="right_arm_link1" pos="0 0 0.138" quat="1.0 0.0 0.0 0.0" gravcomp="1">
+                    <inertial pos="-0.00077 -0.00006 -0.00686" mass="0.77" diaginertia="0.0006669 0.00054501 0.00051509" />
+                    <joint name="right_arm_joint1" axis="0 0 1" range="-2.7 2.7"/>
+                    <geom mesh="link1" class="visual" material="gray_mat"/>
+                    <geom mesh="link1" class="collision"/>
+                    
+                    <body name="right_arm_link2" pos="0 0 0" quat="0.000033 0.000033 0.707105 -0.707108" gravcomp="1">
+                      <inertial pos="-0.00011 -0.06072 0.00148" mass="0.49" diaginertia="0.00053808 0.00029435 0.00040266" />
+                      <joint name="right_arm_joint2" axis="0 0 1" range="-1.74 1.74"/>
+                      <geom mesh="link2" class="visual" material="light_medium_gray_mat"/>
+                      <geom mesh="link2" class="collision"/>
+                      
+                      <body name="right_arm_link3" pos="0 -0.31 0" quat="-0.000003 0.000003 -0.707108 0.707105" gravcomp="1">
+                        <inertial pos="0.00014 0.00211 -0.04853" mass="0.67" diaginertia="0.00342528 0.0033924 0.00026169" />
+                        <joint name="right_arm_joint3" axis="0 0 1" range="-2.75 2.75"/>
+                        <geom mesh="link3" class="visual" material="gray_mat"/>
+                        <geom mesh="link3" class="collision"/>
+                        
+                        <body name="right_arm_link4" pos="0 0 0" quat="-0.000003 0.000003 -0.707108 0.707105" gravcomp="1">
+                          <inertial pos="-0.00013 -0.05482 0.00132" mass="0.41" diaginertia="0.00031331 0.00013204 0.0002393" />
+                          <joint name="right_arm_joint4" axis="0 0 1" range="0 2.14"/>
+                          <geom mesh="link4" class="visual" material="light_medium_gray_mat"/>
+                          <geom mesh="link4" class="collision"/>
+                          
+                          <body name="right_arm_link5" pos="0 -0.27001 0" quat="0.499998 0.500000 -0.500000 0.500002" gravcomp="1">
+                            <inertial pos="0.00303 0.00617 -0.11778" mass="0.56" diaginertia="0.0008249 0.00078548 0.00021015" />
+                            <joint name="right_arm_joint5" axis="0 0 1" range="-2.75 2.75"/>
+                            <geom mesh="link5" class="visual" material="gray_mat"/>
+                            <geom mesh="link5" class="collision"/>
+                            
+                            <body name="right_arm_link6" pos="0 0 0" quat="0.499998 0.500000 -0.500000 0.500002" gravcomp="1">
+                              <inertial pos="0.00014 -0.0027 -0.00025" mass="0.31" diaginertia="0.00008181 0.00007176 0.00007906" />
+                              <joint name="right_arm_joint6" axis="0 0 1" range="-0.73 0.95"/>
+                              <geom mesh="link6" class="visual" material="light_medium_gray_mat"/>
+                              <geom mesh="link6" class="collision"/>
+                              
+                              <body name="right_arm_link7" pos="0 -0.0235 0" euler="1.5708 0 -1.5708" gravcomp="1">
+                                <inertial pos="-0.00014 -0.0001 -0.00275" mass="0.000001" diaginertia="1.1e-07 1.1e-07 2e-07" />
+                                <joint name="right_arm_joint7" axis="0 0 1" range="-1.57 1.57"/>
+                                <geom mesh="link7" class="visual" material="gray_mat"/>
+                                <geom mesh="link7" class="collision"/>
+                                
+                                <!-- End Effector with stand_v2 -->
+                                <body name="right_arm_end_effector" pos="0 0.033 -0.0235" gravcomp="1">
+                                  <inertial pos="-0.01208 -0.00025 0.00032" mass="0.05" diaginertia="2.697e-05 4.311e-05 2.479e-05" />
+                                  <geom mesh="stand_v2" euler="-1.57 0 -1.57" class="visual" material="gray_mat"/>
+                                  <geom mesh="stand_v2" euler="-1.57 0 -1.57" class="collision"/>
+                                  <site name="right_arm_ee" pos="0 0 0.1"/>
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+          </body>
+        </body>
+      </body>
+      <site name="base_site" pos="0 0 0" quat="1 0 0 0" />
+      <camera name="front_camera" mode="track" fovy="90.0"
+        quat="4.329780281177467e-17 4.329780281177466e-17 0.7071067811865475 0.7071067811865476"
+        pos="0.0 2.0 0.5" />
+      <camera name="side_camera" mode="track" fovy="90.0"
+        quat="-0.5 -0.4999999999999999 0.5 0.5000000000000001" pos="-2.0 0.0 0.5" />
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="front_left_steer_ctrl" joint="front_left_steer" class="steering_joint" />
+    <velocity name="drive_front_left_ctrl" joint="drive_front_left" class="drive_joint" />
+    <position name="back_left_steer_ctrl" joint="back_left_steer" class="steering_joint" />
+    <velocity name="drive_back_left_ctrl" joint="drive_back_left" class="drive_joint" />
+    <position name="front_right_steer_ctrl" joint="front_right_steer" class="steering_joint" />
+    <velocity name="drive_front_right_ctrl" joint="drive_front_right" class="drive_joint" />
+    <position name="back_right_steer_ctrl" joint="back_right_steer" class="steering_joint" />
+    <velocity name="drive_back_right_ctrl" joint="drive_back_right" class="drive_joint" />
+
+    <position name="lift" tendon="lift" class="telescope" />
+
+    
+    <!-- Left arm actuators (7 DOF) -->
+    <motor name="left_arm_joint1_pos" joint="left_arm_joint1" class="nero"/>
+    <motor name="left_arm_joint2_pos" joint="left_arm_joint2" class="nero"/>
+    <motor name="left_arm_joint3_pos" joint="left_arm_joint3" class="nero"/>
+    <motor name="left_arm_joint4_pos" joint="left_arm_joint4" class="nero"/>
+    <motor name="left_arm_joint5_pos" joint="left_arm_joint5" class="nero"/>
+    <motor name="left_arm_joint6_pos" joint="left_arm_joint6" class="nero"/>
+    <motor name="left_arm_joint7_pos" joint="left_arm_joint7" class="nero"/>
+
+    <!-- Right arm actuators (7 DOF) -->
+    <motor name="right_arm_joint1_pos" joint="right_arm_joint1" class="nero"/>
+    <motor name="right_arm_joint2_pos" joint="right_arm_joint2" class="nero"/>
+    <motor name="right_arm_joint3_pos" joint="right_arm_joint3" class="nero"/>
+    <motor name="right_arm_joint4_pos" joint="right_arm_joint4" class="nero"/>
+    <motor name="right_arm_joint5_pos" joint="right_arm_joint5" class="nero"/>
+    <motor name="right_arm_joint6_pos" joint="right_arm_joint6" class="nero"/>
+    <motor name="right_arm_joint7_pos" joint="right_arm_joint7" class="nero"/>
+    
+  </actuator>
+
+  <contact>
+    <exclude body1="left_arm_base_link" body2="left_arm_link1" />
+    <exclude body1="right_arm_base_link" body2="right_arm_link1" />
+    <exclude body1="Lift_Top" body2="left_arm_base_link" />
+    <exclude body1="Lift_Top" body2="right_arm_base_link" />
+    <exclude body1="base_profile_short" body2="Part_2" />
+    <exclude body1="base_profile_short" body2="Part_2_2" />
+    <exclude body1="Part_2" body2="MK4_Colson_Hub_4_X_1.5" />
+    <exclude body1="base_profile_short" body2="Part_2_3" />
+    <exclude body1="Part_2_2" body2="MK4_Colson_Hub_4_X_1.5_2" />
+    <exclude body1="base_profile_short" body2="Part_2_4" />
+    <exclude body1="base_profile_short" body2="Lift_Middle" />
+    <exclude body1="Part_2_3" body2="MK4_Colson_Hub_4_X_1.5_3" />
+    <exclude body1="Part_2_4" body2="MK4_Colson_Hub_4_X_1.5_4" />
+    <exclude body1="Lift_Middle" body2="Lift_Top" />
+  </contact>
+
+  <tendon>
+    <fixed name="lift">
+      <joint joint="Slider_1" coef="1"/>
+      <joint joint="Slider_2" coef="1"/>
+    </fixed>
+  </tendon>
+
+  <sensor>
+    <framepos name="base_site_pos" objtype="site" objname="base_site" />
+    <framequat name="base_site_quat" objtype="site" objname="base_site" />
+    <framelinvel name="base_site_linvel" objtype="site" objname="base_site" />
+    <frameangvel name="base_site_angvel" objtype="site" objname="base_site" />
+    <velocimeter name="base_site_vel" site="base_site" />
+  </sensor>
+</mujoco>
