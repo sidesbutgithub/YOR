@@ -3,13 +3,13 @@ from dynamixel_sdk import COMM_SUCCESS # Uses Dynamixel SDK library
 from robot.arm.dxl import DXL
 
 MY_DXL = 'X_SERIES'
-BAUDRATE = 1000000 # 115200
+BAUDRATE = 57600 # 115200
 
 # https://emanual.robotis.com/docs/en/dxl/protocol2/
 PROTOCOL_VERSION = 2.0
 
 # Factory default ID of all DYNAMIXEL is 1
-DXL_ID = 3
+DXL_ID = 1
 
 # Use the actual port assigned to the U2D2.
 DEVICENAME = '/dev/ttyUSB0'
@@ -62,5 +62,5 @@ class Gripper:
         self.dxl.disable()
 
 if __name__ == "__main__":
-    left_gripper = Gripper(baudrate=57600, dxl_id=1, device_name='COM6')
+    left_gripper = Gripper(baudrate=57600, dxl_id=1, device_name=DEVICENAME)
     print(left_gripper.dxl.calibrate_motor())

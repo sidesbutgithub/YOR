@@ -153,7 +153,7 @@ class ArmNode:
             # Auto-disable instead of crashing.
             try:
                 dxl_id = DXL_ID_LEFT if is_left_arm else DXL_ID_RIGHT
-                self.gripper = Gripper(baudrate=BAUDRATE, dxl_id=dxl_id)
+                self.gripper = Gripper(baudrate=57600, dxl_id=1, device_name='/dev/ttyUSB0')
 
                 open_gripper_value, close_gripper_value = self.gripper.dxl.calibrate_motor()
                 self.open_gripper_value = open_gripper_value

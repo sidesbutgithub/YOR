@@ -270,13 +270,13 @@ class JoystickNode:
                     joint_val = apply_deadzone(np.array([j5, j6, j7, grip], dtype=float))
                     joint_pos = np.copy(self.yor.get_left_joint_positions())
                     joint_pos[4:] += joint_val[:-1]*0.01*TWO_PI
-                    self.left_gripper += joint_val[-1]*0.01
+                    self.left_gripper += joint_val[-1]*0.1
                     self.left_gripper = max(0, min(self.left_gripper, 1.0))
-                    self.yor.set_left_joint_target(joint_pos, joint_val[-1])
+                    self.yor.set_left_joint_target(joint_pos, self.left_gripper)
 
                 elif curr_mode == "right joints upper":
-                    j1 = self.joystick.get_axis(controller_map["left_vertical_axis"])
-                    j2 = self.joystick.get_axis(controller_map["left_horizontal_axis"])
+                    j1 = -self.joystick.get_axis(controller_map["left_vertical_axis"])
+                    j2 = -self.joystick.get_axis(controller_map["left_horizontal_axis"])
                     j3  = self.joystick.get_axis(controller_map["right_horizontal_axis"])
                     j4 = -self.joystick.get_axis(controller_map["right_vertical_axis"])
                     joint_val = apply_deadzone(np.array([j1, j2, j3, j4], dtype=float))

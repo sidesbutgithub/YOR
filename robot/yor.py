@@ -19,7 +19,7 @@ from robot.base import Base
 from robot.arm.arm_agx_control import ArmNode
 from robot.base import BaseController
 from commlink import RPCServer, Subscriber
-from nerolib import FirmwareVersion
+#from nerolib import FirmwareVersion
 import threading
 
 THOR_IP = '192.168.1.11'
@@ -81,15 +81,15 @@ class YOR():
             self.left_arm = ArmNode(
                 can_port="can_left",
                 mjcf_path=(_HERE / "yor-description/scene.mjcf").as_posix(),
-                dynamixel_gripper=False,
-                firmware_version=FirmwareVersion.DEFAULT,
+                dynamixel_gripper=True,
+                
             )
             self.right_arm = ArmNode(
                 can_port="can_right",
                 mjcf_path=(_HERE / "yor-description/scene.mjcf").as_posix(),
                 is_left_arm=False,
                 dynamixel_gripper=False,
-                firmware_version=FirmwareVersion.DEFAULT,
+                
             )
      
 
